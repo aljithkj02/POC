@@ -14,4 +14,9 @@
     kubectl delete pod nginx
 
     kubectl apply -f <file.yml>
+
+    kubectl get deployment
+    kubectl get rs   // rs means replica set
+
+    kubectl describe deployment <deployment_name>
 ```
