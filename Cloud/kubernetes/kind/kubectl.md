@@ -5,6 +5,7 @@
     kubectl get nodes --v=8     // verboose level 8
 
     kubectl get pods
+    kubectl get pods -owide
 
     kubectl run nginx --image=nginx --port=80
     kubectl logs nginx
