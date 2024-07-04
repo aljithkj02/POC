@@ -10,4 +10,4 @@ spec:
       port: 80
       targetPort: 80
       nodePort: 30007 # This port can be any valid port within the NodePort range
-  type: NodePort   # There are different types.
+  type: LoadBalancer   # There are different types.

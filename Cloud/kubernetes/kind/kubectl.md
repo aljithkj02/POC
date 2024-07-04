@@ -19,4 +19,10 @@
     kubectl get rs   // rs means replica set
 
     kubectl describe deployment <deployment_name>
+
+    kubectl get namespaces
+    kubectl get pods --all-namespaces
+    kubectl create namespace backend
+
+    kubectl config set-context --current --namespace=backend
 ```
