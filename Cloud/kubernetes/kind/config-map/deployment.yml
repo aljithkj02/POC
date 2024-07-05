@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: express
+  template:
+    metadata:
+      labels:
+        app: express
+    spec:
+      containers:
+        - name: express
+          image: 100xdevs/env-backend
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: express-config
+                  key: database_url
+            - name: CACHE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: express-config
+                  key: cache_size
+            - name: PAYMENT_GATEWAY_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: express-config
+                  key: payment_gateway_url
+            - name: MAX_CART_ITEMS
+              valueFrom:
+                configMapKeyRef:
+                  name: express-config
+                  key: max_cart_items
+            - name: SESSION_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: express-config
+                  key: session_timeout
