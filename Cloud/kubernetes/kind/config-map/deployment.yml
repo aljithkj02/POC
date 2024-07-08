@@ -21,8 +21,8 @@ spec:
           env:
             - name: DATABASE_URL
               valueFrom:
-                configMapKeyRef:
-                  name: express-config
+                secretKeyRef:
+                  name: express-secret
                   key: database_url
             - name: CACHE_SIZE
               valueFrom:

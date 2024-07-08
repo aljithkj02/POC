@@ -12,6 +12,9 @@ nodes:
   - containerPort: 30007
     hostPort: 30008
 - role: worker
+  extraPortMappings:
+  - containerPort: 30007
+    hostPort: 30009
 
 
 # kind create cluster --config <config_path> --name <cluster_name>
