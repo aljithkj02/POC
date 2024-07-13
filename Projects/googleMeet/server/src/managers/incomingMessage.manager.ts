@@ -77,17 +77,22 @@ class IncomingMessage {
         
         this.users[this.id] = ws;
 
+        ws.send(JSON.stringify({
+            type: MessageTypes.JOIN_SUCCESSFUL
+        }))
+
         room.owner.send(JSON.stringify({
             type: MessageTypes.NEW_USER,
             data: {
                 userId: this.id
             }
         }))
-
+        
         this.id++;
     }
 
     private giveOffer(ws: WebSocket, payload: GiveOfferPayload) {
+        console.log(payload)
         const room = this.appStore[payload.roomId];
         if (!room) {
             ws.send(JSON.stringify({
