@@ -24,3 +24,8 @@
 ```
     ./kafka-console-producer.sh --topic quickstart-events --bootstrap-server localhost:9092
 ```
+
+## Notes
+```
+    https://projects.100xdevs.com/tracks/kafka/Kafka-1
+```
