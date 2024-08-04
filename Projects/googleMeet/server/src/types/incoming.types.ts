@@ -21,6 +21,7 @@ export type GiveAnswerPayload = {
 export type IceCandidateOwner = {
     candidate: string;
     roomId: string;
+    userId: number;
 }
 
 export type IceCandidateUser = {

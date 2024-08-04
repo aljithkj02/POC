@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
-import { useWsRoom } from "../hooks/useWsRoom";
+import { useDispatch, useSelector } from "react-redux";
+import { AppStoreType } from "../store/appStore";
+import { setStream } from "../store/slices/global.slice";
 
 export const Room = () => {
+  const joinId = useSelector((state: AppStoreType) => state.global.joinId);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { id } = useParams();
-  useWsRoom(id as string);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     startStreaming();
@@ -13,6 +14,8 @@ export const Room = () => {
 
   const startStreaming = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
+    dispatch(setStream(stream));
+    
     if(videoRef.current){
         videoRef.current.srcObject = stream;
 
@@ -22,7 +25,7 @@ export const Room = () => {
 
   return (
     <div className="w-full h-[91.9vh] flex flex-col items-center">
-        <p className="text-center py-3 text-xl font-semibold text-blue-700">{id}</p>
+        <p className="text-center py-3 text-xl font-semibold text-blue-700">{joinId}</p>
         <video width={700} ref={videoRef}></video>
     </div>
   )

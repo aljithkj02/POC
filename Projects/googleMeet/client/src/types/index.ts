@@ -9,7 +9,18 @@ export enum MessageTypes {
     GIVE_ANSWER = "GIVE_ANSWER",
     RECEIVE_ANSWER = "RECEIVE_ANSWER",
     NEW_USER = "NEW_USER",
-    ICE_CANDIDATE = "ICE_CANDIDATE",
+    USER_ICE_CANDIDATE = "USER_ICE_CANDIDATE",
+    OWNER_ICE_CANDIDATE = "OWNER_ICE_CANDIDATE",
     ICE_CANDIDATE_TO_OWNER = "ICE_CANDIDATE_TO_OWNER",
     ICE_CANDIDATE_TO_USER = "ICE_CANDIDATE_TO_USER"
+}
+
+export interface ReceiveAnswerPayload {
+    userId: number;
+    sdp: RTCSessionDescription
+}
+
+export interface IceCandidateToOwnerPayload {
+    userId: number;
+    candidate: RTCIceCandidate;
 }

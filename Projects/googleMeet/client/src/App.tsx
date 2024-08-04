@@ -4,6 +4,8 @@ import { Home } from './pages/Home'
 import { Room } from './pages/Room'
 import { Viewer } from './pages/Viewer'
 import { Layout } from './components/Layout'
+import { Provider } from 'react-redux'
+import { appStore } from './store/appStore'
 
 const router = createBrowserRouter([
   {
@@ -29,9 +31,11 @@ const router = createBrowserRouter([
 function App() {
 
   return (
-    <>
-      <RouterProvider router={router} />
-    </>
+    <div>
+      <Provider store={appStore}>
+        <RouterProvider router={router} />
+      </Provider>
+    </div>
   )
 }
 

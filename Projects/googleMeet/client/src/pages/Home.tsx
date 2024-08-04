@@ -1,9 +1,26 @@
-import { useState } from "react"
-import { useWsHome } from "../hooks/useWsHome";
-
+import { useEffect, useState } from "react"
+import { wsManager } from "../managers/ws.manager";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AppStoreType } from "../store/appStore";
 export const Home = () => {
   const [text, setText] = useState("");
-  const [handleNewMeeting, handleJoinRoom] = useWsHome();
+  const { isJoined, joinId } = useSelector((state: AppStoreType) => state.global);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (joinId) navigate(`/room/${joinId}`);
+    if (isJoined) navigate(`/viewer`);
+  }, [isJoined, joinId])
+
+  const handleNewMeeting = () => {
+    wsManager.createRoom();
+  }
+
+  const handleJoinRoom = (id: string) => {
+    wsManager.joinRoom(id);
+  }
 
   return (
     <div className="mx-20 grid grid-cols-2 h-[90vh] items-center">

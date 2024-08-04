@@ -78,21 +78,22 @@ class IncomingMessage {
         this.users[this.id] = ws;
 
         ws.send(JSON.stringify({
-            type: MessageTypes.JOIN_SUCCESSFUL
+            type: MessageTypes.JOIN_SUCCESSFUL,
+            data: {
+                userId: this.id,
+                roomId
+            }
         }))
-
+        
         room.owner.send(JSON.stringify({
             type: MessageTypes.NEW_USER,
-            data: {
-                userId: this.id
-            }
+            data: this.id
         }))
         
         this.id++;
     }
 
     private giveOffer(ws: WebSocket, payload: GiveOfferPayload) {
-        console.log(payload)
         const room = this.appStore[payload.roomId];
         if (!room) {
             ws.send(JSON.stringify({
@@ -147,7 +148,7 @@ class IncomingMessage {
         }
 
         user.send(JSON.stringify({
-            type: MessageTypes.ICE_CANDIDATE,
+            type: MessageTypes.USER_ICE_CANDIDATE,
             data: payload.candidate
         }))
     }
@@ -163,8 +164,11 @@ class IncomingMessage {
         }
 
         room.owner.send(JSON.stringify({
-            type: MessageTypes.ICE_CANDIDATE,
-            data: payload.candidate
+            type: MessageTypes.OWNER_ICE_CANDIDATE,
+            data: {
+                userId: payload.userId,
+                candidate: payload.candidate
+            }
         }))
     }
 }
