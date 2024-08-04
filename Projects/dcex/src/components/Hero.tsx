@@ -1,5 +1,7 @@
 "use client"
+import { signIn, useSession } from "next-auth/react"
 import { SecondaryButton } from "./atoms/SecondaryButton"
+import { useRouter } from "next/navigation"
 
 export const GoogleLogo = () => (
     <div className="p-2 bg-white rounded-lg me-1">
@@ -10,6 +12,9 @@ export const GoogleLogo = () => (
 )
 
 export const Hero = () => {
+    const session = useSession();
+    const router = useRouter();
+
     return (
         <div className="mt-14">
             <p className="font-semibold text-6xl text-center">
@@ -28,12 +33,20 @@ export const Hero = () => {
             </p>
 
             <div className="flex justify-center my-5">
-                <SecondaryButton
-                    onClick={() => {}}
-                    prefix={<GoogleLogo />}
-                >
-                    Sign up with Google
-                </SecondaryButton>
+                { session.data?.user ? (
+                    <SecondaryButton
+                        onClick={() => router.push('/dashboard')}
+                    >
+                        Go to Dashboard
+                    </SecondaryButton>
+                ) : (
+                    <SecondaryButton
+                        onClick={() => signIn('google')}
+                        prefix={<GoogleLogo />}
+                    >
+                        Sign up with Google
+                    </SecondaryButton>
+                )}
             </div>
         </div>
     )
