@@ -1,6 +1,6 @@
 "use client"
 import { signIn, signOut, useSession } from "next-auth/react"
-import { PrimaryButton } from "./PrimaryButton";
+import { PrimaryButton } from "./atoms/PrimaryButton";
 
 export const AppBar = () => {
     const session = useSession();
