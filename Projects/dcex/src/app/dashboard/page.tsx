@@ -1,51 +1,46 @@
-"use client"
+import { ProfileCard } from "@/components/ProfileCard";
+import db from '@/db'
+import { authConfig } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation";
+async function getUserWallet() {
+    const session = await getServerSession(authConfig);
 
-export default function Dashboard() {
-    const session = useSession();
-    const router = useRouter();
+    if (!session?.user) return null;
 
-    if (session.status === 'loading') {
-        return (
-            <div className="mt-28">
-                <p className="text-2xl text-center">Loading...</p>
-            </div>
-        )
+    
+    const userWallet = await db.solWallet.findUnique({
+        where: {
+            userId: session?.user?.uid || '1'
+        },
+        select: {
+            publicKey: true
+        }
+    })
+
+    if (!userWallet) {
+        return {
+            error: "No solana wallet found associated to the user"
+        }
     }
+    
+    return { error: null, userWallet };
+}
 
-    if (!session.data?.user) {
-        router.push('/');
-        return null;
+export default async function Dashboard() {
+    const userWalletInfo = await getUserWallet();
+    
+    console.log({userWalletInfo})
+
+    if (userWalletInfo?.error || !userWalletInfo?.userWallet?.publicKey) {
+        return (
+            <p className="text-red-500 text-center mt-10">No Solana Wallet found!</p>
+        )
     }
 
     return (
         <div>
-            <div className="max-w-3xl shadow-xl rounded-lg p-8 mx-auto mt-10 bg-white">
-                <div className="flex gap-5 items-center">
-                    <img src={session.data?.user?.image || undefined} alt="Profile picture" 
-                        className="w-16 rounded-[50%]"
-                    />
-
-                    <p className="text-2xl font-semibold text-gray-600"> Welcome back, {session.data?.user?.name }!</p>
-                </div>
-
-                <div className="my-5">
-                    <p className="text-gray-500 text-sm">DCEX Account Assets</p>
-                </div>
-
-                <div className="flex justify-between items-center">
-                    <div className="flex items-end gap-3">
-                        <p className="text-6xl font-bold">₹00</p>
-                        <p className="text-gray-500 text-4xl font-bold pb-1">INR</p>
-                    </div>
-
-                    <div className="px-4 py-2 rounded-2xl bg-gray-200 cursor-pointer">
-                        <p className="text-[12px] text-gray-600">Your Wallet Address</p>
-                    </div>
-                </div>
-            </div>
+            <ProfileCard publicKey={userWalletInfo.userWallet?.publicKey} />
         </div>
     )
 }

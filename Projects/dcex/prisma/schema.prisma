@@ -13,6 +13,7 @@ model User {
   profilePicture String?
   password       String?
   email          String  @unique
+  sub            String? @default("")
 
   provider Provider
 

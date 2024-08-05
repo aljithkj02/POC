@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ProvidersProps>
-          <div className="bg-[#F2F8FC] h-screen">
+          <div className="bg-[#F2F8FC] h-screen select-none">
             <AppBar />
             {children}
           </div>
