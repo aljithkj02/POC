@@ -1,5 +1,6 @@
 "use client"
 
+import { useTokens } from "@/hooks/useTokens";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,6 +13,7 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
     const session = useSession();
     const router = useRouter();
     const [copied, setCopied] = useState(false);
+    const { loading, tokenBalances } = useTokens(publicKey);
 
     if (session.status === 'loading') {
         return (
@@ -35,7 +37,6 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
         return () => clearInterval(intervalId);
     }, [copied])
 
-    console.log(session.data.user)
 
     return (
         <div>
@@ -54,7 +55,7 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
 
                 <div className="flex justify-between items-center">
                     <div className="flex items-end gap-3">
-                        <p className="text-6xl font-bold">₹0</p>
+                        <p className="text-6xl font-bold">₹{tokenBalances.totalBalance}</p>
                         <p className="text-gray-500 text-4xl font-bold pb-1">INR</p>
                     </div>
 
