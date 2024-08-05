@@ -5,10 +5,8 @@ import { PrimaryButton } from "./atoms/PrimaryButton";
 export const AppBar = () => {
     const session = useSession();
 
-    console.log({session});
-
     return (
-        <div className="px-8 py-2 border-b flex justify-between items-center">
+        <div className="px-8 py-2 border-b flex justify-between items-center bg-white">
             <div className="cursor-pointer text-xl font-bold">
                 DCEX 
             </div>

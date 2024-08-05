@@ -28,24 +28,35 @@ const handler = NextAuth({
                 const publicKey = keyPair.publicKey.toBase58();
                 const privateKey = keyPair.secretKey.toString();
 
-                await db.user.create({
-                    data: {
-                        username: user.name,
-                        email: user.email,
-                        provider: Provider.Google,
-                        solWallet: {
-                            create: {
-                                publicKey,
-                                privateKey
-                            }
-                        },
-                        inrWallet: {
-                            create: {
-                                balance: 0
+                console.log({
+                    username: user.name,
+                    email: user.email,
+                    profilePicture: user.image,
+                })
+
+                try {
+                    await db.user.create({
+                        data: {
+                            username: user.name,
+                            email: user.email,
+                            profilePicture: user.image,
+                            provider: Provider.Google,
+                            solWallet: {
+                                create: {
+                                    publicKey,
+                                    privateKey
+                                }
+                            },
+                            inrWallet: {
+                                create: {
+                                    balance: 0
+                                }
                             }
                         }
-                    }
-                })
+                    }) 
+                } catch (error) {
+                    console.log((error as Error).message)
+                }
 
                 return true;
             }
