@@ -4,16 +4,50 @@ import { useTokens } from "@/hooks/useTokens";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { TokensTab } from "./TokensTab";
+import { SwapTab } from "./SwapTab";
 
 interface ProfileCardProps {
     publicKey: string;
 }
+
+enum Tab {
+    TOKENS = "tokens",
+    SEND = "send",
+    ADD_FUNDS = "add_funds",
+    WITHDRAW = "withdraw",
+    SWAP = "swap"
+}
+
+const allTabs = [
+    {
+        id: Tab.TOKENS,
+        name: "Tokens"
+    },
+    {
+        id: Tab.SEND,
+        name: "Send"
+    },
+    {
+        id: Tab.ADD_FUNDS,
+        name: "Add Funds"
+    },
+    {
+        id: Tab.WITHDRAW,
+        name: "Withdraw"
+    },
+    {
+        id: Tab.SWAP,
+        name: "Swap"
+    },
+]
 
 export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
     const session = useSession();
     const router = useRouter();
     const [copied, setCopied] = useState(false);
     const { loading, tokenBalances } = useTokens(publicKey);
+    const [tab, setTab] = useState<Tab>(Tab.TOKENS);
 
     if (session.status === 'loading') {
         return (
@@ -28,15 +62,13 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
         return null;
     }
 
-    useEffect(() => {
-        const intervalId = setInterval(() => {
-            setCopied(false)
-        }, 2000);
+    // useEffect(() => {
+    //     const intervalId = setInterval(() => {
+    //         setCopied(false)
+    //     }, 2000);
 
-        return () => clearInterval(intervalId);
-    }, [])
-
-    console.log(tokenBalances)
+    //     return () => clearInterval(intervalId);
+    // }, [])
 
 
     return (
@@ -72,32 +104,22 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
                             </p>
                         </div>
                     </div>
-                </div>
 
-                <div className="bg-[#FAFCFE] p-8 rounded-lg">
-                    <p className="font-semibold py-2 px-4 border-b-2 border-b-black inline-block">Tokens</p>
-
-                    <div className="my-5 flex flex-col gap-2">
-                        { tokenBalances.tokens.map((item) => {
-                            return (<div className="flex justify-between hover:bg-gray-50 transition-all cursor-pointer">
-                                <div className="flex gap-2 items-center">
-                                    <img src={item.image} alt={item.name} 
-                                        className={`w-10 rounded-[50%] p-1 ${item.name === 'SOL' ? 'bg-black p-[9px]': ''}`}
-                                    />
-
-                                    <div>
-                                        <p className="text-sm font-semibold">{item.name}</p>
-                                        <p className="text-[12px] text-gray-500">1 {item.name} = {(item.price as Number).toFixed(2) }</p>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <p className="font-semibold">${item.usdBalance}</p>
-                                </div>
-                            </div>)
+                    <div className="mt-6 grid grid-cols-5 gap-2">
+                        { allTabs.map((item) => {
+                            return (
+                                <button key={item.id} onClick={() => setTab(item.id)}
+                                    className={`col-span-1 p-[10px] rounded-md font-semibold transition-all ${item.id === tab ? 'bg-[#007CBF] text-[#E6F2F9] hover:bg-[#007cbff1]': 'bg-[#E6F2F9] text-[#007CBF] hover:bg-[#d4e8f5]'}`}
+                                >
+                                    { item.name }
+                                </button>
+                            )
                         })}
                     </div>
                 </div>
+
+               { tab === Tab.TOKENS && <TokensTab tokens={tokenBalances.tokens} />}
+               { tab === Tab.SWAP && <SwapTab />}
             </div>
         </div>
     )
