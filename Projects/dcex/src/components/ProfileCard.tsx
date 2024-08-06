@@ -119,7 +119,7 @@ export const ProfileCard = ({ publicKey }: ProfileCardProps) => {
                 </div>
 
                { tab === Tab.TOKENS && <TokensTab tokens={tokenBalances.tokens} />}
-               { tab === Tab.SWAP && <SwapTab />}
+               { tab === Tab.SWAP && <SwapTab balances={tokenBalances.tokens} />}
             </div>
         </div>
     )
