@@ -22,6 +22,7 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
     const [baseAmount, setBaseAmount] = useState(0);
     const [quoteAmount, setQuoteAmount] = useState(0);
     const [fetchingQuote, setFetchingQuote] = useState(false);
+    const [quoteResponse, setQuoteResponse] = useState(null);
 
     const ref = useRef<null | NodeJS.Timeout>(null);
 
@@ -39,6 +40,7 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
         const res = await axios.get(`https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint}&outputMint=${quoteAsset.mint}&amount=${baseAmount * ( 10 ** baseAsset.decimals )}&slippageBps=50`);
         setQuoteAmount(Number(res.data.outAmount) / ( 10 ** quoteAsset.decimals ));
         setFetchingQuote(false);
+        setQuoteResponse(res.data);
     }
 
     const debouncer = () => {
@@ -67,6 +69,19 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
         }
         return "";
     }, []);
+
+    const handleSwap = async () => {
+        if (quoteResponse) {
+            try {
+                const res = await axios.post('http://localhost:3000/api/swap', { quoteResponse });
+                if (res.data.status) {
+                    alert('Swapping done!');
+                }
+            } catch (error) {
+                alert("Error while swapping!")
+            }
+        }
+    }
 
     return (
         <div className="bg-[#FAFCFE] px-8 pb-8 rounded-lg">
@@ -99,7 +114,7 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
             </div>
 
             <div className="flex mt-4 justify-end">
-                <PrimaryButton onClick={() => {}}>
+                <PrimaryButton onClick={handleSwap}>
                     Swap
                 </PrimaryButton>
             </div>
