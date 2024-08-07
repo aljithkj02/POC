@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAccount, getAssociatedTokenAddress, getMint } from '@solana/spl-token'
-import { connection, getSupportedToken } from "@/lib/constants";
+import { connection, getSupportedToken, TokenDetails } from "@/lib/constants";
 import { LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 
 export async function GET(req: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     })
 }
 
-async function getAccountBalance(token: { mint: string, name: string, native: boolean}, address: PublicKey) {
+async function getAccountBalance(token: TokenDetails, address: PublicKey) {
     if (token.native) {
         const balance = await connection.getBalance(new PublicKey(address));
         return balance / LAMPORTS_PER_SOL;
@@ -36,7 +36,7 @@ async function getAccountBalance(token: { mint: string, name: string, native: bo
         const account = await getAccount(connection, ata);
         const mint = await getMint(connection, new PublicKey(token.mint));
     
-        return Number(account.amount) / (10 ** mint.decimals);
+        return Number(account.amount) / (10 ** token.decimals);
     } catch (error) {
         return 0;
     }

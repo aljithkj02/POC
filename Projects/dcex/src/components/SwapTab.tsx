@@ -1,7 +1,8 @@
 import { TokenWithBalance } from "@/hooks/useTokens";
 import { SUPPORTED_TOKENS, TokenDetails } from "@/lib/constants"
-import { ChangeEvent, useCallback, useState } from "react"
+import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react"
 import { PrimaryButton } from "./atoms/PrimaryButton";
+import axios from "axios";
 
 const SwapIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 text-gray-500">
@@ -9,20 +10,52 @@ const SwapIcon = () => (
     </svg>
 ) 
 
+const Loading = () => (
+    <img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Loading..." 
+        className="w-20"
+    />
+)
+
 export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
     const [baseAsset, setBaseAsset] = useState(SUPPORTED_TOKENS[0]);
     const [quoteAsset, setQuoteAsset] = useState(SUPPORTED_TOKENS[1]);
     const [baseAmount, setBaseAmount] = useState(0);
     const [quoteAmount, setQuoteAmount] = useState(0);
+    const [fetchingQuote, setFetchingQuote] = useState(false);
+
+    const ref = useRef<null | NodeJS.Timeout>(null);
+
+
+    useEffect(() => {
+        if (baseAmount) {
+            debouncer();
+        } else {
+            setQuoteAmount(0);
+        }
+    }, [baseAmount, baseAsset, quoteAsset]);
+
+    const fetchQuoteAmount = async () => {
+        setFetchingQuote(true);
+        const res = await axios.get(`https://quote-api.jup.ag/v6/quote?inputMint=${baseAsset.mint}&outputMint=${quoteAsset.mint}&amount=${baseAmount * ( 10 ** baseAsset.decimals )}&slippageBps=50`);
+        setQuoteAmount(Number(res.data.outAmount) / ( 10 ** quoteAsset.decimals ));
+        setFetchingQuote(false);
+    }
+
+    const debouncer = () => {
+        if (ref.current) clearTimeout(ref.current);
+        ref.current = setTimeout(fetchQuoteAmount, 1000);
+    }
 
     const  handleBaseAsset = (asset: TokenDetails) => {
         if (asset.name !== quoteAsset.name) {
             setBaseAsset(asset);
+            setBaseAmount(0);
         }
     }
     const  handleQuoteAsset = (asset: TokenDetails) => {
         if (asset.name !== baseAsset.name) {
             setQuoteAsset(asset);
+            setQuoteAmount(0);
         }
     }
 
@@ -51,6 +84,8 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
                         const token = quoteAsset;
                         setQuoteAsset(baseAsset);
                         setBaseAsset(token);
+                        setBaseAmount(0);
+                        setQuoteAmount(0);
                     }}
                 >
                     <SwapIcon />
@@ -59,6 +94,7 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
                     roundedTop={false} roundedBottom={true} subtitle={subtitle(quoteAsset)}
                     amount={quoteAmount}
                     onAmountChange={(newAmount) => setQuoteAmount(newAmount)}
+                    fetchingQuote={fetchingQuote}
                 />
             </div>
 
@@ -71,8 +107,8 @@ export const SwapTab = ({ balances }: { balances: TokenWithBalance[] }) => {
     )
 }
 
-const SwapInput = ({ token, onChange, oppositeToken, roundedTop, roundedBottom, subtitle, balance, amount, onAmountChange }: { token: TokenDetails, oppositeToken: TokenDetails, onChange: (asset: TokenDetails) => void,
-    roundedTop: boolean, roundedBottom: boolean, subtitle: string, balance?: number, amount: number, onAmountChange: (value: number) => void
+const SwapInput = ({ token, onChange, oppositeToken, roundedTop, roundedBottom, subtitle, balance, amount, onAmountChange, fetchingQuote }: { token: TokenDetails, oppositeToken: TokenDetails, onChange: (asset: TokenDetails) => void,
+    roundedTop: boolean, roundedBottom: boolean, subtitle: string, balance?: number, amount: number, onAmountChange: (value: number) => void, fetchingQuote?: boolean
 }) => {
     const handleOnChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const item = SUPPORTED_TOKENS.find((t) => t.name === e.target.value);
@@ -116,14 +152,14 @@ const SwapInput = ({ token, onChange, oppositeToken, roundedTop, roundedBottom, 
                     </div> 
                 }
 
-                <input type="number" dir="rtl" autoFocus={roundedTop} value={amount}
+                { fetchingQuote ? <Loading /> : <input type="number" dir="rtl" autoFocus={roundedTop} value={amount}
                     className={`text-4xl w-full border-none outline-none ${roundedTop && (amount > (balance || 0)) ? 'text-red-500': 'text-gray-400'}`}
                     onChange={(e) => {
                         if (roundedTop) {
                             onAmountChange(+e.target.value)
                         }
                     }}
-                />
+                /> }
             </div>
         </div>
     )
