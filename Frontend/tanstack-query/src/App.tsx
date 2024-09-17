@@ -15,6 +15,7 @@ function App() {
       const res = await axios.get(`${url}?skip=${0}&limit=${20}`);
       return res.data.products;
     },
+    refetchOnWindowFocus: false,
     enabled: isFetch,
     retry: 10,
     retryDelay: 300,
