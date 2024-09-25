@@ -1,10 +1,12 @@
-import { getToken, onMessage } from 'firebase/messaging';
+import { getToken, NotificationPayload, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './App.css'
 import { messaging } from './firebase/config';
+import axios from 'axios';
 
 const VAPID_KEY = import.meta.env.VITE_APP_VAPID_KEY;
+const URL = 'http://localhost:3000';
 
 function App() {
 
@@ -28,6 +30,8 @@ function App() {
       })
   
       console.log("Token generated : ", token);
+      const res = await axios.post(URL + '/save-token', { token });
+      console.log(res.data);
     } else {
       toast.error("You denied for the notification");
     }
@@ -35,6 +39,8 @@ function App() {
 
   onMessage(messaging, (payload) => {
     console.log({payload});
+    const { title , body } = payload.notification as NotificationPayload;
+    toast.success(body as string);
   })
 
   return (
