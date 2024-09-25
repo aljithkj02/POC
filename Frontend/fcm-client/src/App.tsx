@@ -1,4 +1,4 @@
-import { getToken } from 'firebase/messaging';
+import { getToken, onMessage } from 'firebase/messaging';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import './App.css'
@@ -9,13 +9,19 @@ const VAPID_KEY = import.meta.env.VITE_APP_VAPID_KEY;
 function App() {
 
   useEffect(() => {
-    requestPermission();
+    navigator.serviceWorker.register('/firebase-messaging-sw.js')
+      .then((registration) => {
+        console.log('Service Worker registered:', registration);
+        requestPermission();
+      })
+      .catch((error) => {
+        console.error('Service Worker registration failed:', error);
+      });
   }, []);
 
   const requestPermission = async () => {
     const permission = await Notification.requestPermission();
 
-    console.log({permission});
     if (permission === 'granted') {
       const token = await getToken(messaging, {
         vapidKey: VAPID_KEY
@@ -26,6 +32,10 @@ function App() {
       toast.error("You denied for the notification");
     }
   }
+
+  onMessage(messaging, (payload) => {
+    console.log({payload});
+  })
 
   return (
     <div>
